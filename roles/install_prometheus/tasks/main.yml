@@ -1,0 +1,131 @@
+---
+- name: Instalando dependencias Prometheus
+  apt:
+    name: ["wget", "tar", "git"]
+    state: latest
+    update_cache: yes
+
+- name: Criando grupo prometheus
+  group:
+    name: prometheus
+    state: present
+
+- name: Criando usuario prometheus
+  user:
+    name: prometheus
+    group: prometheus
+    shell: /bin/false
+    system: yes
+
+- name: Download Prometheus
+  get_url:
+    url: "https://github.com/prometheus/prometheus/releases/download/v2.15.1/prometheus-2.15.1.linux-amd64.tar.gz"
+    dest: "/opt/"
+    mode: "0755"
+    owner: prometheus
+    group: prometheus
+ 
+- name: Extraindo tar.gz prometheus
+  unarchive:
+    src: "/opt/prometheus-2.15.1.linux-amd64.tar.gz"
+    dest: "/opt/"
+    mode: "0755"
+    owner: prometheus
+    group: prometheus
+    remote_src: yes
+
+
+- name: Renomeando pasta prometheus
+  shell: "mv /opt/prometheus-2.15.1.linux-amd64 /opt/prometheus"
+
+- name: Criando diretorio /etc/prometheus
+  file:
+    path: /etc/prometheus
+    state: directory
+    mode: "0755"
+    owner: prometheus
+    group: prometheus
+
+
+- name: Criando diretorio /var/lib/prometheus
+  file:
+    path: /var/lib/prometheus
+    state: directory
+    mode: "0755"
+    owner: prometheus
+    group: prometheus
+
+
+- name: Criando diretorio /var/log/prometheus
+  file:
+    path: /var/log/prometheus
+    state: directory
+    mode: "0755"
+    owner: prometheus
+    group: prometheus
+
+- name: Movendo binario prometheus
+  file:
+    src: "/opt/prometheus/prometheus"
+    dest: "/usr/local/bin/prometheus"
+    mode: "0777"
+    owner: prometheus
+    group: prometheus
+    state: hard
+
+- name: Movendo binario promtool
+  file:
+    src: "/opt/prometheus/promtool"
+    dest: "/usr/local/bin/promtool"
+    mode: "0777"
+    owner: prometheus
+    group: prometheus
+    state: hard
+
+- name: Copiando console_libraries
+  copy:
+    src: "/opt/prometheus/console_libraries"
+    dest: "/etc/prometheus/"
+    owner: prometheus
+    group: prometheus
+    mode: "0755"
+    remote_src: yes
+
+- name: Copiando consoles
+  copy:
+    src: "/opt/prometheus/consoles"
+    dest: "/etc/prometheus/"
+    owner: prometheus
+    group: prometheus
+    mode: "0755"
+    remote_src: yes
+
+
+- name: Copiando arquivo de configuração
+  template:
+    src: prometheus.yml.j2
+    dest: "/etc/prometheus/prometheus.yml"
+    owner: prometheus
+    group: prometheus
+    mode: "0755"
+
+
+- name: Criando arquivo systemd prometheus
+  template:
+    src: prometheus.service.j2
+    dest: "/etc/systemd/system/prometheus.service"
+    owner: prometheus
+    group: prometheus
+    mode: "0755"
+
+- name: Enable prometheus.service
+  systemd:
+    name: prometheus
+    enabled: yes
+
+
+- name: Start prometheus.service
+  systemd:
+    name: prometheus
+    state: started
+    daemon_reload: yes

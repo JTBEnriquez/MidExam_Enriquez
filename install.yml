@@ -1,0 +1,10 @@
+---
+- hosts: Elk
+  become: yes
+  become_user: root
+  
+  roles:
+  - java
+  - elas
+  - kib
+  - logst
