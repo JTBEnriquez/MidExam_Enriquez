@@ -3,13 +3,13 @@
   become: yes
   gather_facts: no
   pre_tasks:
-    - name: "Atualizando repositorio"
+    - name: "repository"
       raw: 'apt update'
-    - name: "Instalando python"
+    - name: "Install python"
       raw: 'apt install -y python'
-    - name: "Instalando aptitude"
+    - name: "Install aptitude"
       raw: 'apt install -y aptitude'
-    - name: "Instalando python-apt"
+    - name: "Install python-apt"
       raw: 'apt install -y python-apt'
 
 - hosts: Elk

@@ -73,7 +73,7 @@
       - make install-webconf
     become: true
   - name: Enable apache2 modules
-    apache2_module: state=present name={{ item }}
+    apache2_module: state=absent name={{ item }}
     with_items:
       - rewrite
   - name: Restart Apache2 service

@@ -1,2 +1,14 @@
 ---
 # playbook
+
+- name: ElasticSearch
+  include: install.yml
+
+- name: Nagios
+  include: nagios.yml
+
+- name: GPI
+  include: gpi.yml
+
+- name: LAMP stack
+  include: lamp.yml
